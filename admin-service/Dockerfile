@@ -1,6 +1,6 @@
 FROM node:18-alpine
 
-# Install Docker CLI
+# Needed for restart system
 RUN apk add --no-cache docker-cli
 
 WORKDIR /app

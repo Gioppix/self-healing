@@ -4,6 +4,7 @@ const app = express();
 const PORT = 8080;
 let FAILURE_MODE = "off";
 
+// GET Endpoint used for checking the Critical Service status.
 app.get("/status", async (req, res) => {
     if (FAILURE_MODE === "error") {
         return res
@@ -18,11 +19,16 @@ app.get("/status", async (req, res) => {
     res.status(200).json({ status: "OK" });
 });
 
+/**
+ * GET Endpoint used for setting the Critical Service failure mode. 
+ * Technically should be a POST endpoint but we chose this option for practicality.
+ */
 app.get("/set_failure_mode/:mode", (req, res) => {
     FAILURE_MODE = req.params.mode;
     res.json({ result: "mode set", mode: req.params.mode });
 });
 
+// GET Endpoint used for getting current service failure mode.
 app.get("/get_failure_mode", (req, res) => {
     res.json({ mode: FAILURE_MODE });
 });

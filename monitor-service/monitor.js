@@ -23,9 +23,12 @@ async function sendTelegram(text) {
     console.error('Telegram send failed');
   }
 }
-
+/**
+ * Sends a POST request to admin-service to trigger critical-service restart
+ */
 async function restartService() {
   try {
+    console.log('Restart attempt at ' + ADMIN_RESTART_URL);
     await axios.post(ADMIN_RESTART_URL, { service: 'critical' }, { timeout: 3000 });
     console.log('Restart triggered');
   } catch (error) {
@@ -33,7 +36,11 @@ async function restartService() {
   }
 }
 
-async function checkHealth() {
+/**
+ * Sends a GET request to critical-service to check its status.
+ * Based on the response and latency it might trigger the critical-service restart.
+ */
+async function checkStatus() {
   const start = Date.now();
 
   try {
@@ -57,8 +64,8 @@ async function checkHealth() {
 }
 
 console.log('Monitor Service started');
-console.log(`Polling ${CRITICAL_URL} every ${POLL_INTERVAL/1000}s`);
+console.log(`Polling ${CRITICAL_URL} every ${POLL_INTERVAL / 1000}s`);
 console.log(`Latency threshold: ${LATENCY_THRESHOLD_SEC}s`);
 
-setInterval(checkHealth, POLL_INTERVAL);
-checkHealth();
+setInterval(checkStatus, POLL_INTERVAL);
+checkStatus();

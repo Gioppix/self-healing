@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   critical-service:
     build: ./critical-service
@@ -7,6 +5,10 @@ services:
     ports:
       - "8080:8080"
     environment:
+      # This environment variable has 3 possible values: 'off', 'slow', 'error':
+      #   'off': critical-service operates correctly
+      #   'slow': critical-service has a slower response time
+      #   'error': critical-service does not respond
       - FAILURE_MODE=off
     networks:
       - selfheal-network
