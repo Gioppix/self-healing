@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
     critical-service:
         build: ./critical-service
@@ -8,10 +6,10 @@ services:
             - "8080:8080"
         environment:
             # This environment variable has 3 possible values: 'off', 'slow', 'error':
-      #   'off': critical-service operates correctly
-      #   'slow': critical-service has a slower response time
-      #   'error': critical-service does not respond
-      - FAILURE_MODE=off
+            #   'off': critical-service operates correctly
+            #   'slow': critical-service has a slower response time
+            #   'error': critical-service does not respond
+            - FAILURE_MODE=off
         networks:
             - selfheal-network
 
@@ -35,8 +33,8 @@ services:
             - ADMIN_RESTART_URL=http://admin-service:5001/restart_service
             - TELEGRAM_PROXY_BASE_URL=${TELEGRAM_PROXY_BASE_URL:-https://telegram-proxy.up.railway.app}
             - CHANNEL_ID=${CHANNEL_ID:-}
-            - POLL_INTERVAL=5
-            - LATENCY_THRESHOLD_SEC=0.5
+            - POLL_INTERVAL=${POLL_INTERVAL:-5}
+            - LATENCY_THRESHOLD_SEC=${LATENCY_THRESHOLD:-0.5}
         networks:
             - selfheal-network
         depends_on:
