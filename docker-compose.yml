@@ -1,46 +1,47 @@
+version: '3.8'
+
 services:
-  critical-service:
-    build: ./critical-service
-    container_name: critical
-    ports:
-      - "8080:8080"
-    environment:
-      # This environment variable has 3 possible values: 'off', 'slow', 'error':
+    critical-service:
+        build: ./critical-service
+        container_name: critical
+        ports:
+            - "8080:8080"
+        environment:
+            # This environment variable has 3 possible values: 'off', 'slow', 'error':
       #   'off': critical-service operates correctly
       #   'slow': critical-service has a slower response time
       #   'error': critical-service does not respond
       - FAILURE_MODE=off
-    networks:
-      - selfheal-network
+        networks:
+            - selfheal-network
 
-  admin-service:
-    build: ./admin-service
-    container_name: admin
-    ports:
-      - "5001:5001"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      - selfheal-network
-    depends_on:
-      - critical-service
+    admin-service:
+        build: ./admin-service
+        container_name: admin
+        ports:
+            - "5001:5001"
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+        networks:
+            - selfheal-network
+        depends_on:
+            - critical-service
 
-  monitor-service:
-    build: ./monitor-service
-    container_name: monitor
-    environment:
-      - CRITICAL_URL=http://critical-service:8080/status
-      - ADMIN_RESTART_URL=http://admin-service:5001/restart_service
-      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
-      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID:-}
-      - POLL_INTERVAL=5
-      - LATENCY_THRESHOLD_SEC=0.5
-    networks:
-      - selfheal-network
-    depends_on:
-      - critical-service
-      - admin-service
-
+    monitor-service:
+        build: ./monitor-service
+        container_name: monitor
+        environment:
+            - CRITICAL_URL=http://critical-service:8080/status
+            - ADMIN_RESTART_URL=http://admin-service:5001/restart_service
+            - TELEGRAM_PROXY_BASE_URL=${TELEGRAM_PROXY_BASE_URL:-https://telegram-proxy.up.railway.app}
+            - CHANNEL_ID=${CHANNEL_ID:-}
+            - POLL_INTERVAL=5
+            - LATENCY_THRESHOLD_SEC=0.5
+        networks:
+            - selfheal-network
+        depends_on:
+            - critical-service
+            - admin-service
 networks:
-  selfheal-network:
-    driver: bridge
+    selfheal-network:
+        driver: bridge
