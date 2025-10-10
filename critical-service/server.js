@@ -6,9 +6,7 @@ let FAILURE_MODE = "off";
 
 app.get("/status", async (req, res) => {
     if (FAILURE_MODE === "error") {
-        return res
-            .status(500)
-            .json({ status: "ERROR", message: "Service in error mode" });
+        return res.status(500).json({ status: "ERROR", message: "Service in error mode" });
     }
 
     if (FAILURE_MODE === "slow") {
@@ -28,7 +26,5 @@ app.get("/get_failure_mode", (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(
-        `Critical Service running on port ${PORT}, mode: ${FAILURE_MODE}`,
-    );
+    console.log(`Critical Service running on port ${PORT}, mode: ${FAILURE_MODE}`);
 });
