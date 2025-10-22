@@ -2,8 +2,8 @@
 
 set -e
 
-# CHANNEL_ID=channel_name
-POLL_INTERVAL=5
-LATENCY_THRESHOLD=0.5
+export POLL_INTERVAL=10
+export LATENCY_THRESHOLD=0.5
+export CHANNEL_ID=""
 
 docker-compose up -d --build && docker-compose logs -f

@@ -22,6 +22,7 @@ async function sendTelegram(text) {
             },
             { timeout: 3000 }
         );
+        console.log(`TELEGRAM: message "${text}" sent on [${CHANNEL_ID}]`);
     } catch (error) {
         console.error("Telegram send failed");
     }
@@ -31,10 +32,11 @@ async function sendTelegram(text) {
  */
 async function restartService() {
     try {
+        console.log("Requesting admin service to restart critical service...");
         await axios.post(ADMIN_RESTART_URL, { service: "critical" }, { timeout: 3000 });
-        console.log("Restart triggered");
+        console.log("Admin service restart request completed");
     } catch (error) {
-        console.error("Restart failed:", error.message);
+        console.error("Admin service restart request failed:", error.message);
     }
 }
 
@@ -43,24 +45,26 @@ async function restartService() {
  * Based on the response and latency it might trigger the critical-service restart.
  */
 async function checkStatus() {
-    const start = Date.now();
+    let alertMessage = null;
 
     try {
+        const start = Date.now();
         const response = await axios.get(CRITICAL_URL, { timeout: 2000 });
         const latency = (Date.now() - start) / 1000;
 
         console.log(`Status: ${response.status}, Latency: ${latency.toFixed(3)}s`);
 
         if (response.status !== 200 || latency > LATENCY_THRESHOLD_SEC) {
-            const message = `ALERT: status ${response.status} latency ${latency.toFixed(2)}s`;
-            await sendTelegram(message);
-            await restartService();
+            alertMessage = `ALERT: status ${response.status} latency ${latency.toFixed(2)}s`;
         }
     } catch (error) {
-        const latency = (Date.now() - start) / 1000;
-        const message = `ALERT: service unreachable (${error.message})`;
-        console.error(message);
-        await sendTelegram(message);
+        alertMessage = `ALERT: service unreachable (${error.message})`;
+    }
+
+    if (alertMessage) {
+        console.error(alertMessage);
+        await sendTelegram(alertMessage);
+
         await restartService();
     }
 }

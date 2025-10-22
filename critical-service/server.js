@@ -2,26 +2,33 @@ const express = require("express");
 const app = express();
 
 const PORT = 8080;
+
+const ALLOWED_MODES = ["off", "error", "slow"];
 let FAILURE_MODE = "off";
 
 // GET Endpoint used for checking the Critical Service status.
 app.get("/status", async (req, res) => {
-    if (FAILURE_MODE === "error") {
-        return res.status(500).json({ status: "ERROR", message: "Service in error mode" });
-    }
-
-    if (FAILURE_MODE === "slow") {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+    switch (FAILURE_MODE) {
+        case "error":
+            return res.status(500).json({ status: "ERROR", message: "Service in error mode" });
+        case "slow":
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+            break;
     }
 
     res.status(200).json({ status: "OK" });
 });
 
 /**
- * GET Endpoint used for setting the Critical Service failure mode. 
+ * GET Endpoint used for setting the Critical Service failure mode.
  * Technically should be a POST endpoint but we chose this option for practicality.
  */
 app.get("/set_failure_mode/:mode", (req, res) => {
+    if (!ALLOWED_MODES.includes(req.params.mode)) {
+        console.error(`Invalid failure mode attempted: ${req.params.mode}`);
+        return res.status(400).json({ error: "Invalid failure mode", allowed: ALLOWED_MODES });
+    }
+
     FAILURE_MODE = req.params.mode;
     res.json({ result: "mode set", mode: req.params.mode });
 });

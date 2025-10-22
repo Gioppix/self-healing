@@ -34,29 +34,29 @@ Using the provided `start.sh` script
 
 Follow these hands-on scenarios. Open two browser tabs side-by-side:
 
-1) Baseline (healthy)
+1. Baseline (healthy)
 
 - In Tab A open: http://localhost:8080/critical-service/status — you should see a JSON response `{ "status": "OK" }` and HTTP 200.
 - Watch the monitor logs in your terminal running `docker compose logs -f monitor` — the monitor should report `Status: 200` and low latency.
 
-2) Simulate a slow service
+2. Simulate a slow service
 
 - In Tab B open: http://localhost:8080/critical-service/set_failure_mode/slow
 - Now switch back to Tab A and refresh http://localhost:8080/critical-service/status repeatedly. The endpoint will delay by about 1 second.
 - The `monitor-service` polls every `POLL_INTERVAL` seconds (default 5s) and compares latency to `LATENCY_THRESHOLD_SEC` (default 0.5s). Because the service is slower than the threshold, the monitor should detect the problem, log an alert, and call the admin restart endpoint.
 - Watch for these signs:
-  - `docker compose logs -f monitor` shows an alert and a `Restart triggered` message.
-  - `docker compose logs -f admin` shows the restart request received and the admin executing `docker restart`.
-  - `docker compose logs -f critical` may show the container restarted (or you can run `docker ps` or `docker logs critical` in another terminal).
-  These can also be viewed from the dedicated Docker GUI. 
+    - `docker compose logs -f monitor` shows an alert and a `Restart triggered` message.
+    - `docker compose logs -f admin` shows the restart request received and the admin executing `docker restart`.
+    - `docker compose logs -f critical` may show the container restarted (or you can run `docker ps` or `docker logs critical` in another terminal).
+      These can also be viewed from the dedicated Docker GUI.
 
-3) Simulate an error (unreachable / 5xx)
+3. Simulate an error (unreachable / 5xx)
 
 - In Tab B open: http://localhost:8080/critical-service/set_failure_mode/error
 - The `status` endpoint will return HTTP 500 and JSON `{ status: "ERROR" }`.
 - Monitor should detect the non-200 response and trigger a restart of the `critical` container.
 
-4) Return to healthy
+4. Return to healthy
 
 - In Tab B open: http://localhost:8080/critical-service/set_failure_mode/off
 - Refresh Tab A — response should be `{ "status": "OK" }` again.
@@ -64,6 +64,7 @@ Follow these hands-on scenarios. Open two browser tabs side-by-side:
 ## Parameters to edit
 
 Edit `start.sh` to control:
+
 - `POLL_INTERVAL` (seconds between monitor checks)
 - `LATENCY_THRESHOLD_SEC` (seconds; when exceeded the monitor will consider service too slow)
 - `CHANNEL_ID` (Telegram channel ID: if not provided the monitor will simply print alerts to its logs.)
@@ -71,17 +72,17 @@ Edit `start.sh` to control:
 ## Windows notes / Docker socket
 
 - The `admin-service` expects to run `docker restart <service>` inside the container. The compose file mounts the host Docker socket (`/var/run/docker.sock`) into the container to allow this. On Linux and WSL2 this works as-is.
- - The `admin-service` expects to run `docker restart <service>` inside the container. The compose file mounts the host Docker socket (`/var/run/docker.sock`) into the container to allow this. On Linux and WSL2 this works as-is.
- - On Windows: ensure Docker Desktop WSL2 integration is enabled for your distribution. If `admin` fails to restart containers, check the `admin` logs and confirm the socket is available inside the container.
+- The `admin-service` expects to run `docker restart <service>` inside the container. The compose file mounts the host Docker socket (`/var/run/docker.sock`) into the container to allow this. On Linux and WSL2 this works as-is.
+- On Windows: ensure Docker Desktop WSL2 integration is enabled for your distribution. If `admin` fails to restart containers, check the `admin` logs and confirm the socket is available inside the container.
 
 ## Troubleshooting
 
 - If monitor never triggers a restart:
-  - Check `POLL_INTERVAL`/`LATENCY_THRESHOLD_SEC` in `.env` and the `monitor` logs.
-  - Ensure `monitor` can reach `CRITICAL_URL` (service names are resolved via Docker network when containers are used; in local host tests use `localhost:8080`).
+    - Check `POLL_INTERVAL`/`LATENCY_THRESHOLD_SEC` in `.env` and the `monitor` logs.
+    - Ensure `monitor` can reach `CRITICAL_URL` (service names are resolved via Docker network when containers are used; in local host tests use `localhost:8080`).
 - If `admin` fails to restart the container:
-  - Check `docker compose logs admin` for the error from the `exec` call.
-  - Ensure the Docker CLI is available to the admin container (see Windows notes above).
+    - Check `docker compose logs admin` for the error from the `exec` call.
+    - Ensure the Docker CLI is available to the admin container (see Windows notes above).
 
 ## Suggested exercises for students
 
@@ -94,3 +95,6 @@ Edit `start.sh` to control:
 
 This project is a compact, hands-on demo of a self-healing pattern: a monitor detects service degradation and asks an admin component to recover the failing service. Use the links above to toggle the `critical-service` state in a second tab and watch the monitor react in the first tab.
 
+## Telegram Proxy
+
+For more information about the Telegram proxy implementation, refer to the [telegram-bot-proxy repository](https://github.com/gioppix/telegram-bot-proxy/).
