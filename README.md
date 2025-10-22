@@ -27,8 +27,18 @@ Using the provided `start.sh` script
 ./start.sh
 ```
 
-- The script contains a placeholder `CHANNEL_ID` variable, replace it with your Telegram chat id before running the script so
-  you can subscribe to this project's bot using `/subscribe @self_healing_bot` (or unsubscribe using `/unsubscribe @self_healing_bot`).
+- The script contains a placeholder `CHANNEL_ID` variable, replace it with a channel of your choice.
+
+### Managing Telegram channels subscriptions
+
+To receive Telegram notifications, follow these steps:
+
+- Open `@self_healing_bot` on Telegram
+- Send `/subscribe <channel_id>`
+    - `channel_id` can only contain alphanumeric characters and underscores (e.g. `live_demo`)
+    - Use a unique name to avoid conflicts with other users
+- You can be subscribed to multiple channels at once
+- You can also use `/unsubscribe <channel_id>` if needed
 
 ## Walkthrough scenarios
 
