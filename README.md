@@ -47,29 +47,21 @@ Follow these hands-on scenarios. Open two browser tabs side-by-side:
 1. Baseline (healthy)
 
 - In Tab A open: http://localhost:8080/critical-service/status — you should see a JSON response `{ "status": "OK" }` and HTTP 200.
-- Watch the monitor logs in your terminal running `docker compose logs -f monitor` — the monitor should report `Status: 200` and low latency.
+- Watch the monitor logs in your terminal - the monitor should report `Status: 200` and low latency.
 
 2. Simulate a slow service
 
 - In Tab B open: http://localhost:8080/critical-service/set_failure_mode/slow
 - Now switch back to Tab A and refresh http://localhost:8080/critical-service/status repeatedly. The endpoint will delay by about 1 second.
 - The `monitor-service` polls every `POLL_INTERVAL` seconds (default 5s) and compares latency to `LATENCY_THRESHOLD_SEC` (default 0.5s). Because the service is slower than the threshold, the monitor should detect the problem, log an alert, and call the admin restart endpoint.
-- Watch for these signs:
-    - `docker compose logs -f monitor` shows an alert and a `Restart triggered` message.
-    - `docker compose logs -f admin` shows the restart request received and the admin executing `docker restart`.
-    - `docker compose logs -f critical` may show the container restarted (or you can run `docker ps` or `docker logs critical` in another terminal).
-      These can also be viewed from the dedicated Docker GUI.
+- Keep refreshing Tab A: after a few seconds you will se the service healthy again, thanks to a restart clearing the failure mode
 
 3. Simulate an error (unreachable / 5xx)
 
 - In Tab B open: http://localhost:8080/critical-service/set_failure_mode/error
 - The `status` endpoint will return HTTP 500 and JSON `{ status: "ERROR" }`.
 - Monitor should detect the non-200 response and trigger a restart of the `critical` container.
-
-4. Return to healthy
-
-- In Tab B open: http://localhost:8080/critical-service/set_failure_mode/off
-- Refresh Tab A — response should be `{ "status": "OK" }` again.
+- Keep refreshing Tab A: after a few seconds you will se the service healthy again, thanks to a restart clearing the failure mode
 
 ## Parameters to edit
 
