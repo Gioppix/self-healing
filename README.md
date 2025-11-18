@@ -75,25 +75,6 @@ Edit `start.sh` to control:
 - The `admin-service` expects to run `docker restart <service>` inside the container. The compose file mounts the host Docker socket (`/var/run/docker.sock`) into the container to allow this. On Linux and WSL2 this works as-is.
 - On Windows: ensure Docker Desktop WSL2 integration is enabled for your distribution. If `admin` fails to restart containers, check the `admin` logs and confirm the socket is available inside the container.
 
-## Troubleshooting
-
-- If monitor never triggers a restart:
-    - Check `POLL_INTERVAL`/`LATENCY_THRESHOLD_SEC` in `.env` and the `monitor` logs.
-    - Ensure `monitor` can reach `CRITICAL_URL` (service names are resolved via Docker network when containers are used; in local host tests use `localhost:8080`).
-- If `admin` fails to restart the container:
-    - Check `docker compose logs admin` for the error from the `exec` call.
-    - Ensure the Docker CLI is available to the admin container (see Windows notes above).
-
-## Suggested exercises for students
-
-1. Tweak `LATENCY_THRESHOLD_SEC` and `POLL_INTERVAL` to see how detection speed and sensitivity change.
-2. Add a POST-based API for `critical-service` to set failure modes instead of GET.
-3. Replace `admin-service`'s `exec('docker restart ...')` with direct Docker Engine API calls or Docker SDK usage.
-4. Add a small web UI that shows current mode and allows toggling it from one page (single-page demo).
-
-## Summary
-
-This project is a compact, hands-on demo of a self-healing pattern: a monitor detects service degradation and asks an admin component to recover the failing service. Use the links above to toggle the `critical-service` state in a second tab and watch the monitor react in the first tab.
 
 ## Telegram Proxy
 
