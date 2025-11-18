@@ -19,8 +19,6 @@ Welcome! This small project demonstrates a simple self-healing architecture made
 - Docker Compose (Docker Desktop includes it).
 - On Windows: WSL2 is required. This project depends on a Unix-style Docker socket (`/var/run/docker.sock`) which is available when Docker Desktop is used with the WSL2 backend. Run all commands from a WSL2 shell.
 
-Using the provided `start.sh` script
-
 - A convenience script `start.sh` is included to build and start the stack and tail the logs. Run it from Linux or a WSL2 shell:
 
 ```bash
@@ -46,19 +44,19 @@ Follow these hands-on scenarios. Open two browser tabs side-by-side:
 
 1. Baseline (healthy)
 
-- In Tab A open: http://localhost:8080/critical-service/status — you should see a JSON response `{ "status": "OK" }` and HTTP 200.
+- In Tab A open: http://localhost:8080/status — you should see a JSON response `{ "status": "OK" }` and HTTP 200.
 - Watch the monitor logs in your terminal - the monitor should report `Status: 200` and low latency.
 
 2. Simulate a slow service
 
-- In Tab B open: http://localhost:8080/critical-service/set_failure_mode/slow
-- Now switch back to Tab A and refresh http://localhost:8080/critical-service/status repeatedly. The endpoint will delay by about 1 second.
+- In Tab B open: http://localhost:8080/set_failure_mode/slow
+- Now switch back to Tab A and refresh http://localhost:8080/status repeatedly. The endpoint will delay by about 1 second.
 - The `monitor-service` polls every `POLL_INTERVAL` seconds (default 5s) and compares latency to `LATENCY_THRESHOLD_SEC` (default 0.5s). Because the service is slower than the threshold, the monitor should detect the problem, log an alert, and call the admin restart endpoint.
 - Keep refreshing Tab A: after a few seconds you will se the service healthy again, thanks to a restart clearing the failure mode
 
 3. Simulate an error (unreachable / 5xx)
 
-- In Tab B open: http://localhost:8080/critical-service/set_failure_mode/error
+- In Tab B open: http://localhost:8080/set_failure_mode/error
 - The `status` endpoint will return HTTP 500 and JSON `{ status: "ERROR" }`.
 - Monitor should detect the non-200 response and trigger a restart of the `critical` container.
 - Keep refreshing Tab A: after a few seconds you will se the service healthy again, thanks to a restart clearing the failure mode
