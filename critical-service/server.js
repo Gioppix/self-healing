@@ -5,18 +5,21 @@ const PORT = 8080;
 
 const ALLOWED_MODES = ["off", "error", "slow"];
 let FAILURE_MODE = "off";
+let memory = 0;
 
 // GET Endpoint used for checking the Critical Service status.
 app.get("/status", async (req, res) => {
     switch (FAILURE_MODE) {
         case "error":
-            return res.status(500).json({ status: "ERROR", message: "Service in error mode" });
+            return res.status(500).json({ status: "ERROR", message: "Service in error mode", memory: memory});
         case "slow":
             await new Promise((resolve) => setTimeout(resolve, 1000));
             break;
     }
 
-    res.status(200).json({ status: "OK" });
+    memory += 100;
+
+    res.status(200).json({ status: "OK", memory: memory});
 });
 
 /**
