@@ -77,4 +77,3 @@ console.log(`Polling ${CRITICAL_URL} every ${POLL_INTERVAL / 1000}s`);
 console.log(`Latency threshold: ${LATENCY_THRESHOLD_SEC}s`);
 
 setInterval(checkStatus, POLL_INTERVAL);
-checkStatus();
