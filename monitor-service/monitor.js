@@ -51,14 +51,16 @@ async function checkStatus() {
         const start = Date.now();
         const response = await axios.get(CRITICAL_URL, { timeout: 2000 });
         const latency = (Date.now() - start) / 1000;
+        const body = response.data;
+        const memory = body.memory;
 
         //EXERCISE 1: SHOW THE MEMORY IN THE LOG AND ADD RECOVER CONDITION ON MEMORY
-        console.log(`Status: ${response.status}, Latency: ${latency.toFixed(3)}s`);
+        console.log(`Status: ${response.status}, Latency: ${latency.toFixed(3)}s, Memory: ${memory}KB`);
 
         //EXERCISE 2: LET THE MONITOR ACCEPT 1s LATENCY
-        if (response.status !== 200 || latency > LATENCY_THRESHOLD_SEC) {
+        if (response.status !== 200 || latency > 1 || memory > 700) {
             //ASSIGMENT: CREATE A MEMORY_THRESHOLD_KB AND SET IT TO 600 THEN SHOW IT IN THE ALERT MESSAGE IN CASE OF MEMORY ERROR
-            alertMessage = `ALERT: status ${response.status} latency ${latency.toFixed(2)}s`;
+            alertMessage = `ALERT: status ${response.status} latency ${latency.toFixed(2)}s, Memory: ${memory}KB`;
         }
     } catch (error) {
         alertMessage = `ALERT: service unreachable (${error.message})`;
