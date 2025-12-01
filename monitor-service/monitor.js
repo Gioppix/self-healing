@@ -55,12 +55,12 @@ async function checkStatus() {
         const memory = body.memory;
 
         //EXERCISE 1: SHOW THE MEMORY IN THE LOG AND ADD RECOVER CONDITION ON MEMORY
-        console.log(`Status: ${response.status}, Latency: ${latency.toFixed(3)}s, Memory: ${memory}KB`);
+        console.log(`Status: ${response.status}, Latency: ${latency.toFixed(3)}s`);
 
         //EXERCISE 2: LET THE MONITOR ACCEPT 1s LATENCY
-        if (response.status !== 200 || latency > 1 || memory > 700) {
+        if (response.status !== 200 || latency > LATENCY_THRESHOLD_SEC) {
             //ASSIGMENT: CREATE A MEMORY_THRESHOLD_KB AND SET IT TO 600 THEN SHOW IT IN THE ALERT MESSAGE IN CASE OF MEMORY ERROR
-            alertMessage = `ALERT: status ${response.status} latency ${latency.toFixed(2)}s, Memory: ${memory}KB`;
+            alertMessage = `ALERT: status ${response.status} latency ${latency.toFixed(2)}s`;
         }
     } catch (error) {
         alertMessage = `ALERT: service unreachable (${error.message})`;
