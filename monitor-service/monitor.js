@@ -51,6 +51,8 @@ async function checkStatus() {
         const start = Date.now();
         const response = await axios.get(CRITICAL_URL, { timeout: 2000 });
         const latency = (Date.now() - start) / 1000;
+        const body = response.data;
+        const memory = body.memory;
 
         console.log(`Status: ${response.status}, Latency: ${latency.toFixed(3)}s`);
 
@@ -74,4 +76,3 @@ console.log(`Polling ${CRITICAL_URL} every ${POLL_INTERVAL / 1000}s`);
 console.log(`Latency threshold: ${LATENCY_THRESHOLD_SEC}s`);
 
 setInterval(checkStatus, POLL_INTERVAL);
-checkStatus();

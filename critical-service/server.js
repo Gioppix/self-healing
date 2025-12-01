@@ -11,15 +11,16 @@ let memory = 0;
 app.get("/status", async (req, res) => {
     switch (FAILURE_MODE) {
         case "error":
-            return res.status(500).json({ status: "ERROR", message: "Service in error mode", memory: memory});
+            return res.status(500).json({ status: "ERROR", message: "Service in error mode", memory: memory });
         case "slow":
             await new Promise((resolve) => setTimeout(resolve, 1000));
             break;
     }
 
+    // Simulate memory leak
     memory += 100;
 
-    res.status(200).json({ status: "OK", memory: memory});
+    res.status(200).json({ status: "OK", memory });
 });
 
 /**
